@@ -13,6 +13,10 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  env:
+    DOCKER_ORG: erriez
+    IMAGE_VERSION: latest
+    
   setup:
     runs-on: ubuntu-latest
     steps:
@@ -57,8 +61,12 @@ jobs:
     steps:
       - name: Test Hello World images
         shell: bash
+        env:
+          DOCKER_ORG: ${{ env.DOCKER_ORG }}
+          IMAGE_VERSION: ${{ env.IMAGE_VERSION }}
         run: |
           echo "Running test job!"
+          echo "Testing $DOCKER_ORG/hello:$IMAGE_VERSION"
           docker run -i --rm ${DOCKER_ORG}/hello:${IMAGE_VERSION}
   deploy:
     runs-on: ubuntu-latest
