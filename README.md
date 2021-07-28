@@ -24,7 +24,9 @@ curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 <editor> .env
 
 # Configure secrets
-Github | Actions | TBD
+Github project | Settings | Secrets | New Repository Secret...:
+   DOCKER_USERNAME
+   DOCKER_PASSWORD
 ```
 
 ## Usage
