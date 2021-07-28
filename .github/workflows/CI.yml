@@ -25,19 +25,19 @@ jobs:
         run: |
           docker --version
           docker buildx version
-  build-all:
-    runs-on: ubuntu-latest
-    needs:
-      - setup
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build images all targets
-        shell: bash
-        run: |
-          echo "Building for ALL_PLATFORMS=${{ env.ALL_PLATFORMS }}"
-          docker buildx create --use --name mybuild
-          docker buildx bake -f build/build.hcl --set *.platform=${{ env.ALL_PLATFORMS }} #--progress plain
+  # build-all:
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - setup
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Build images all targets
+  #       shell: bash
+  #       run: |
+  #         echo "Building for ALL_PLATFORMS=${{ env.ALL_PLATFORMS }}"
+  #         docker buildx create --use --name mybuild
+  #         docker buildx bake -f build/build.hcl --set *.platform=${{ env.ALL_PLATFORMS }} #--progress plain
   build-local:
     runs-on: ubuntu-latest
     needs:
@@ -56,9 +56,10 @@ jobs:
       - build-local
     steps:
       - name: Test Hello World images
+        shell: bash
         run: |
           echo "Running test job!"
-          docker run -it --rm ${DOCKER_ORG}/hello:${IMAGE_VERSION}
+          docker run -i --rm ${DOCKER_ORG}/hello:${IMAGE_VERSION}
   deploy:
     runs-on: ubuntu-latest
     needs:
