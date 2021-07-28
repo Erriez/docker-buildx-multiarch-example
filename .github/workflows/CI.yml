@@ -65,7 +65,10 @@ jobs:
       - test
     steps:
       - name: Deploy Hello World images
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "Todo deploy images to registry"
-          echo "My username: ${{ secret.DOCKER_USERNAME }}"
-          echo "My password: ${{ secret.DOCKER_PASSWORD }}"
+          echo "My username: $DOCKER_USERNAME"
+          echo "My password: $DOCKER_PASSWORD"
