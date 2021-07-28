@@ -9,14 +9,10 @@ on:
     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  # workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  env:
-    DOCKER_ORG: erriez
-    IMAGE_VERSION: latest
-    
+jobs:    
   setup:
     runs-on: ubuntu-latest
     steps:
@@ -62,8 +58,8 @@ jobs:
       - name: Test Hello World images
         shell: bash
         env:
-          DOCKER_ORG: ${{ env.DOCKER_ORG }}
-          IMAGE_VERSION: ${{ env.IMAGE_VERSION }}
+          DOCKER_ORG: ${{ secrets.DOCKER_ORG }}
+          IMAGE_VERSION: latest
         run: |
           echo "Running test job!"
           echo "Testing $DOCKER_ORG/hello:$IMAGE_VERSION"

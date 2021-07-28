@@ -25,6 +25,7 @@ curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 
 # Configure secrets
 Github project | Settings | Secrets | New Repository Secret...:
+   DOCKER_ORG
    DOCKER_USERNAME
    DOCKER_PASSWORD
 ```
