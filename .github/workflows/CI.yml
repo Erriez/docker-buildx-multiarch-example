@@ -11,12 +11,12 @@ on:
 
 # Global environment variables
 env:
-  - DOCKER_ORG: erriez
-  - IMAGE_VERSION: latest
+  DOCKER_ORG: erriez
+  IMAGE_VERSION: latest
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:    
-  setup:
+  Build:
     runs-on: ubuntu-latest
     steps:
       # Checkout
@@ -43,34 +43,67 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+          install: true
+
+      # Print buildx environment
+      - name: Inspect builder
         run: |
           echo "Name:      ${{ steps.buildx.outputs.name }}"
           echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
-
-      # Print versions
-      - name: Print versions
-        run: |
           docker --version
           docker buildx version
 
-  build:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      # Build Docker images
-      - name: Build
+      #------------------------------------------------------------
+      # Build Docker image for platform ARM64
+      - name: Build image
         uses: docker/build-push-action@v2
         with:
           context: hello
-          file: Dockerfile
+          file: hello/Dockerfile
+          tags: ${{ env.DOCKER_ORG }}/hello:${{ env.IMAGE_VERSION }}
           push: false
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          load: true # Load works only for one single target
+          platforms: linux/arm64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-      
+
+      #------------------------------------------------------------
+      # Test Docker image ARM64
+      - name: Test image
+        run: |
+          echo "Images:"
+          docker images
+          echo "Run container:"
+          docker run --rm --platform linux/arm64 ${{ env.DOCKER_ORG }}/hello:${{ env.IMAGE_VERSION }}
+          echo "Remove container:"
+          docker rmi ${{ env.DOCKER_ORG }}/hello:${{ env.IMAGE_VERSION }}
+
+      #------------------------------------------------------------
+      # Build for all targets
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          context: hello
+          file: hello/Dockerfile
+          tags: ${{ env.DOCKER_ORG }}/hello:${{ env.IMAGE_VERSION }}
+          push: false
+          load: false # Load works only for one single target
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      #------------------------------------------------------------
+      # Cleanup on build failure
+      - name: Cleanup build failure
+        if: ${{ failure() }}
+        run: |
+          rm -rf /tmp/.buildx-cache
+
 
   # build-all:
   #   runs-on: ubuntu-latest
@@ -97,25 +130,67 @@ jobs:
   #         docker buildx bake -f build/build.hcl --load
   #         docker images
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Test Hello World images
-        shell: bash
-        # env:
-        #   DOCKER_ORG: ${{ secrets.DOCKER_ORG }}
-        #   IMAGE_VERSION: latest
-        run: |
-          echo "Running test job!"
-          echo "Testing ${DOCKER_ORG}/hello:${IMAGE_VERSION}"
-          docker images
-          docker run --rm ${DOCKER_ORG}/hello:${IMAGE_VERSION}
+  # Test:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     # Checkout
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-  deploy:
+  #     # Cache docker layers
+  #     - name: Cache Docker layers
+  #       uses: actions/cache@v2
+  #       id: cache
+  #       with:
+  #         path: /tmp/.buildx-cache
+  #         key: ${{ runner.os }}-buildx-${{ github.sha }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-buildx-
+      
+  #     # Setup QEMU
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v1
+  #       with:
+  #         platforms: linux/amd64,linux/arm/v7,linux/arm64
+      
+  #     # Setup buildx
+  #     - name: Set up Docker Buildx
+  #       id: buildx
+  #       uses: docker/setup-buildx-action@v1
+  #       with:
+  #         version: latest
+  #         install: true
+
+  #     # Build Docker images
+  #     - name: Build
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: hello
+  #         file: hello/Dockerfile
+  #         push: false
+  #         load: true
+  #         platforms: linux/amd64
+  #         cache-from: type=local,src=/tmp/.buildx-cache
+  #         cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+  #     # Test hello world image
+  #     - name: Test Hello World images
+  #       shell: bash
+  #       # env:
+  #       #   DOCKER_ORG: ${{ secrets.DOCKER_ORG }}
+  #       #   IMAGE_VERSION: latest
+  #       run: |
+  #         echo "Running test job!"
+  #         echo "Testing ${DOCKER_ORG}/hello:${IMAGE_VERSION}"
+  #         docker images
+  #         docker run --rm ${DOCKER_ORG}/hello:${IMAGE_VERSION}
+
+  Deploy:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: build
     steps:
+      # Push images to dockerhub registry
       - name: Deploy Hello World images
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

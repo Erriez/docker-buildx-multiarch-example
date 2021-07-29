@@ -4,5 +4,4 @@ ARG TARGETPLATFORM
 
 RUN echo "Building on $BUILDPLATFORM for $TARGETPLATFORM!"
 
-CMD echo "Hello World from container!"
-
+CMD arch && echo "Hello World from container!"
