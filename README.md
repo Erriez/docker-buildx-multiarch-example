@@ -1,4 +1,7 @@
 # Docker buildx Hello World
+
+**IMPORTANT NOTE: WORK IN PROGRESS**
+
 This is an example project to build multi-architecture Docker images
 with buildx and test Github Actions on local machine.
 
