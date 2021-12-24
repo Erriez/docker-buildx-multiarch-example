@@ -41,14 +41,14 @@ jobs:
 
       # Build
       - name: Build and push
-        uses: docker/bake-action@master
+        uses: docker/bake-action@1.6.0
         if: env.IS_AUTHORIZED_RUN == 'false'
         with:
           files: build.hcl
 
       # Build and push
       - name: Build and push
-        uses: docker/bake-action@master
+        uses: docker/bake-action@1.6.0
         if: env.IS_AUTHORIZED_RUN == 'true'
         with:
           files: build.hcl
