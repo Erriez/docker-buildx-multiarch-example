@@ -5,7 +5,7 @@ variable "DOCKER_PREFIX" {
   default = ""
 }
 variable "IMAGE_VERSION" {
-  default = "latest"
+  default = "local"
 }
 
 group "default" {

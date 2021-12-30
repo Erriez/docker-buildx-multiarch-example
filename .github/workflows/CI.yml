@@ -32,12 +32,15 @@ jobs:
       - name: Create image version
         shell: bash
         run: |
-          # Change 'master' to 'latest', or use the branch name or tag
-          if [ "$GITHUB_REF_NAME" == "master" ]; then
-            pinned_version="latest"
-          else
-            pinned_version="$GITHUB_REF_NAME"
+          pinned_version="ci-build"
+          if [ "$GITHUB_EVENT_NAME" != 'pull_request' ]; then
+            if [ "$GITHUB_REF_NAME" == "master" ]; then
+              pinned_version="latest"
+            else
+              pinned_version="${GITHUB_REF##*/}"
+            fi
           fi
+          echo "Building IMAGE_VERSION=$pinned_version"
           echo "IMAGE_VERSION=$pinned_version" >> $GITHUB_ENV
 
       # QEMU setup
