@@ -57,17 +57,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build
-      - name: Build and push
+      # Build and optional push
+      - name: Build and optional push
         uses: docker/bake-action@v1.6.0
-        if: env.IS_AUTHORIZED_RUN == 'false'
         with:
           files: build.hcl
-
-      # Build and push
-      - name: Build and push
-        uses: docker/bake-action@v1.6.0
-        if: env.IS_AUTHORIZED_RUN == 'true'
-        with:
-          files: build.hcl
-          push: true
+          push: ${{ env.IS_AUTHORIZED_RUN }}
