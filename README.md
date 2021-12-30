@@ -1,6 +1,8 @@
-# Docker buildx bake Hello World
+[![CI](https://github.com/Erriez/docker-buildx-multiarch-example/actions/workflows/CI.yml/badge.svg)](https://github.com/Erriez/docker-buildx-multiarch-example/actions/workflows/CI.yml) 
+[![License](https://img.shields.io/github/license/Erriez/docker-buildx-multiarch-example)](https://github.com/Erriez/docker-buildx-multiarch-example/blob/master/LICENSE)
+[![Tag](https://shields.io/github/v/tag/Erriez/docker-buildx-multiarch-example)](https://github.com/Erriez/docker-buildx-multiarch-example/tags)
 
-**IMPORTANT NOTE: WORK IN PROGRESS**
+# Docker buildx bake Hello World
 
 This is an example project to build multi-architecture Docker images
 with buildx and test Github Actions on a local machine with Act.
