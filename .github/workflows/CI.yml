@@ -3,8 +3,14 @@ name: CI
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
-  - push
-  - pull_request
+  push:
+    branches:
+      - 'master'
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - 'master'
 
   # Allows you to run this workflow manually from the Actions tab
   # workflow_dispatch:
@@ -21,6 +27,18 @@ jobs:
       # Checkout
       - name: Checkout
         uses: actions/checkout@v2
+      
+      # Create image version from branch/tag
+      - name: Create image version
+        shell: bash
+        run: |
+          # Change 'master' to 'latest', or use the branch name or tag
+          if [ "$GITHUB_REF_NAME" == "master" ]; then
+            pinned_version="latest"
+          else
+            pinned_version="$GITHUB_REF_NAME"
+          fi
+          echo "IMAGE_VERSION=$pinned_version" >> $GITHUB_ENV
 
       # QEMU setup
       - name: Set up QEMU
